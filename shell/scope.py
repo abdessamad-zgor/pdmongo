@@ -10,7 +10,6 @@ class ShellScope:
 
     def to_dict(self):
         scope_dict = {key: value for key, value in vars(self).items() if not callable(value)}
-        print(scope_dict)
         return scope_dict
     @staticmethod
     def from_dict(obj):
