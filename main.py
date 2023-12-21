@@ -1,8 +1,8 @@
-from shell.core import Shell, get_args, get_client
+from shell.core import Shell, get_command_line_args, get_client
 from shell.scope import ShellScope
 
 def main():
-    args = get_args()
+    args = get_command_line_args()
     client = get_client(args.url)
     shell_scope = ShellScope(client, client['test'])
     shell = Shell(shell_scope)

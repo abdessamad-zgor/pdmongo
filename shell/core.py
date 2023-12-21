@@ -2,7 +2,7 @@ import sys
 import argparse
 import ast
 import inspect
-from typing import Any
+from typing import Any, List
 
 from .utils import Builtin
 from .scope import ShellScope
@@ -13,7 +13,7 @@ from pymongo import MongoClient
 
 
 # Firstly, get the arguments provided by the user 
-def get_args():
+def get_command_line_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('-u', '--url', type=str, default='mongodb://localhost', help='url to MongoDb instance if none then localhost is used by default.')
     #parser.add_argument()
@@ -39,6 +39,10 @@ def is_expression(input: str, scope: ShellScope):
     except Exception as e:
         return False
 
+# get argument values from Ast Node
+def get_arguments(args: List[Any]):
+    return [arg.value for arg in args]
+
 # detects if input calls builtin functions
 def is_shell_builtin(input: str):
     command_tree = ast.parse(input)
@@ -49,10 +53,11 @@ def is_shell_builtin(input: str):
         isinstance(command_node.value.func, ast.Name) and
         hasattr(command_node.value.func, 'id') and
             command_node.value.func.id in builtin_funcs):
-        arguments = command_node.value.args[0].value
-        return (builtin_funcs[command_node.value.func.id], [arguments])
+        arguments = get_arguments(command_node.value.args)
+        return (builtin_funcs[command_node.value.func.id], arguments)
     return None
 
+# execute a command and intercept the output
 def oexec(scope: ShellScope, input: str):
     buffer = StringIO()
     scope_dict = scope.to_dict()
@@ -63,6 +68,7 @@ def oexec(scope: ShellScope, input: str):
     scope_dict['locals'].update(locals)
     return (ShellScope.from_dict(scope_dict), output)
 
+# turn any value into presentable form
 def repr_output(value: Any):
     def is_iter(val: Any):
         try:
@@ -74,15 +80,13 @@ def repr_output(value: Any):
         return dict(value) if isinstance(value, dict) else list(value)
     return value
 
+# print values deppending on thier types
 def pdprint(value: Any):
     value = repr_output(value)
     if isinstance(value, str):
         print(value)
     else:
         pprint(value)
-
-        
-
 
 # A Shell makes the connection to database and allows the user to execute commands 
 # and use the client API remotely with feedback
@@ -98,8 +102,11 @@ class Shell:
                 (scope, output) = self.run_command(command)
                 pdprint(output)
                 self.scope = scope
+            except KeyboardInterrupt:
+                print("\nGracefully shutting down.")
+                exit(0)
             except Exception as e:
-                raise e
+                print(e)
     
     def run_command(self, input: str):
         result = is_shell_builtin(input)

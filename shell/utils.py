@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from typing import List
 from .scope import ShellScope
@@ -12,16 +13,16 @@ class Builtin:
 
     @staticmethod
     def load_json(scope: ShellScope, collection: str, path: str):
-        df = pd.read_json(path, orient='records')
+        df = pd.read_json(os.path.join(os.getcwd(), path), orient='records')
         scope_dict = scope.to_dict()
         scope_dict['locals']['df'] = df
-        scope_dict['db'][collection].insert_many(df.to_json(orient='records'))
+        scope_dict['db'][collection].insert_many(df.to_dict(orient='records'))
 
         return (ShellScope.from_dict(scope_dict), f"loaded file '{path}' to collection '{collection}'")
 
     @staticmethod
     def load_csv(scope: ShellScope, collection: str, path:str, cols: List[str]= []):
-        df = pd.read_csv(path, orient='records', names=cols)
+        df = pd.read_csv(os.path.join(os.getcwd(), path), orient='records', names=cols)
         scope_dict = scope.to_dict()
         scope_dict['locals']['df'] = df
         scope_dict['db'][collection].insert_many(df.to_json(orient='records'))
