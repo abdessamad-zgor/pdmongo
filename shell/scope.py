@@ -15,5 +15,5 @@ class ShellScope:
         return scope_dict
     @staticmethod
     def from_dict(obj):
-        return ShellScope(obj['client'], obj['db'], obj, obj['locals'])
+        return ShellScope(obj['client'], obj['db'], obj['locals'])
         
