@@ -1,7 +1,7 @@
 # PdMongo
 
-a MongoDB shell for data analysts using Pandas for data manipulation and discovery providing a Mongosh like inteface and a usefull builtin functions
-for your data manipulation needs
+a MongoDB shell for data analysts using Pandas for data manipulation and discovery providing a Mongosh like interface and usefull builtin functions
+for your data manipulation needs.
 
 ## Usage
 ```
