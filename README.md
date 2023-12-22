@@ -5,7 +5,7 @@ for your data manipulation needs
 
 ## Usage
 `
-git clone git@github.com:abdessamad-zgor/pdmongo.git
+git clone git@github.com:abdessamad-zgor/pdmongo.git \n
 cd pdmongo
 pip install -r requirements.txt
 source env/bin/activate.sh
